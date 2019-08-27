@@ -72,12 +72,17 @@ u64 intern_aggregate(u64 intern1, u64 intern2){
   if(aggregate_table == NULL){
     aggregate_table = u128_to_u64_create("intern_aggregate");
   }
-  u64 key[] = {intern1, intern2};
+  union {
+    u64 key[2];
+    u128 key2;
+  }x;
+  x.key[0] = intern1;
+  x.key[1] = intern2;
   u64 id;
-  if(u128_to_u64_try_get(aggregate_table, (u128 *) key, &id)){
+  if(u128_to_u64_try_get(aggregate_table, &x.key2, &id)){
     return id;
   }
   id = id_new();
-  u128_to_u64_set(aggregate_table, ((u128 *) key)[0], id);
+  u128_to_u64_set(aggregate_table, x.key2, id);
   return id;
 }

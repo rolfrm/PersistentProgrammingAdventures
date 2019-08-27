@@ -13,3 +13,13 @@
 
 #include "margin_table.h"
 #include "margin_table.c"
+
+#include "u64_to_vec2_table.h"
+#include "u64_to_vec2_table.c"
+
+#include "u64_to_f32_table.h"
+#include "u64_to_f32_table.c"
+
+#include "redirection_table.h"
+#include "redirection_table.c"
+

@@ -1,5 +1,5 @@
 OPT = -g3 -Og
-LIB_SOURCES1 = main.c string_intern.c tables.c
+LIB_SOURCES1 = main.c string_intern.c tables.c octree.c
 LIB_SOURCES = $(addprefix src/, $(LIB_SOURCES1))
 
 CC = gcc
