@@ -2,6 +2,8 @@
 #include <iron/full.h>
 #include "main.h"
 #include <iron/gl.h>
+#include <GL/gl.h>
+//#include <GL/glew.h>
 #include "u64_table.h"
 typedef void * void_ptr;
 #include "u64_to_ptr.h"
@@ -337,6 +339,25 @@ void control_measure(u64 control){
 
 
 u64_to_ptr * window_handle;
+void test_render_quadheight();
+void render_octree_control(u64 control){
+  UNUSED(control);
+  float x = 0,y = 0,w = 0,h = 0;
+  margin_table_try_get(layout, &control, &x, &y, &w, &h);
+
+  int vpdata[4];
+  glGetIntegerv(GL_VIEWPORT, vpdata);
+  glViewport(x,y,w,h);
+  glScissor(x,y,w,h);
+  blit_push();
+  blit_begin(BLIT_MODE_UNIT);
+  blit_rectangle(-1,-1,2,2, 0,0,0,1);
+  test_render_quadheight();
+  blit_pop();
+  glViewport(vpdata[0], vpdata[1], vpdata[2], vpdata[3]);
+  glScissor(vpdata[0],vpdata[1],vpdata[2],vpdata[3]);
+  
+}
 
 void render_window(u64 control){
   if(window_handle == NULL){
@@ -348,11 +369,14 @@ void render_window(u64 control){
     u64_to_ptr_set(window_handle, control, win_handle);
   }
   gl_window_make_current(win_handle);
+
+      
   if(gl_window_get_key_state(win_handle, 0x0020)){
     printf("SPACE Pressed\n");
   }
   call_method(control, control, measure_method);
   call_method(control, control, arrange_method);
+
   blit_begin(BLIT_MODE_PIXEL);
   blit_scale(2,2);
   int width = 512, height = 512;
@@ -469,6 +493,15 @@ int main(int argc, char ** argv){
   margin_table_set(color, btn2, 1.0, 0.0, 0.0, 1.0);
 
   control_add_child(my_window, btn2);
+
+  u64 octree_view = intern_string("octree");
+  set_baseclass(octree_view, uielement);
+  control_add_child(my_window, octree_view);
+  define_method2(octree_view, render_method, (method)render_octree_control);
+
+  
+
+  
   iron_gl_backend = IRON_GL_BACKEND_X11;
 
   

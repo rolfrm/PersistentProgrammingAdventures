@@ -1,5 +1,5 @@
 OPT = -g3 -Og
-LIB_SOURCES1 = main.c string_intern.c tables.c octree.c
+LIB_SOURCES1 = main.c string_intern.c tables.c octree.c basic3d.shader.c quadheight.c
 LIB_SOURCES = $(addprefix src/, $(LIB_SOURCES1))
 
 CC = gcc
@@ -18,6 +18,11 @@ all: $(ALL)
 
 .c.o: $(HEADERS) $(LEVEL_CS)
 	$(CC) $(CFLAGS) $< -o $@ -MMD -MF $@.depends
+
+
+src/basic3d.shader.c: src/basic3d.vs src/basic3d.fs
+	xxd -i src/basic3d.vs > src/basic3d.shader.c
+	xxd -i src/basic3d.fs >> src/basic3d.shader.c
 
 depend: h-depend
 clean:

@@ -110,11 +110,18 @@ octree_index octree_index_sub(octree * tree, octree_index index, size_t sub, boo
       }
       
     }
-    
   }
   printf("error finding sub index\n");
   return (octree_index){.index = octree_invalid_index};
 }
+/*
+void scanline_trace(octree * o, vec3 p, vec3 d, u8 * buffer, size_t buffer_len){
+  vec3 d;
+  vec3 p = vec3_new(0,0,0);
+
+}
+*/
+
 
 void test_octree_algorithm(){
   octree * o = octree_new();
@@ -139,7 +146,7 @@ void test_octree_algorithm(){
   octree_index_sub(o, octree_index_sub(o, octree_index_sub(o, i8, 2, true), 2, true), 2, true);
   logd("%i\n", i8.index);
 
-  for(u32 j = 0; j < o->count; j++){
+   for(u32 j = 0; j < o->count; j++){
     logd("%i : %i\n", j, o->buffer[j]);
   }
   
