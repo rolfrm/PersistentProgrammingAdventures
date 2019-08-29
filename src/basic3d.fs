@@ -1,13 +1,12 @@
 #version 300 es
 precision mediump float;
 out vec4 out_color;
-uniform vec3 camera_center;
 in vec3 position;
 in vec3 local_position;
 in vec3 local_ray;
 void main(){
   vec3 dir = local_ray / length(local_ray);
-  float l = length(camera_center - position) * 0.5;
+  float l = length(local_ray);
   
   vec3 ray = local_position;
   for(int i = 0; i < 10; i++){
@@ -25,7 +24,7 @@ void main(){
     ray = ray + dir * d * 1.1;
     }
   //discard;
-  l *= 0.5;
+  l *= 0.1;
   out_color = vec4(l, l, l,1);	
 	
 

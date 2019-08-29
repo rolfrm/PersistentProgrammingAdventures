@@ -1,5 +1,6 @@
 #define GL_GLEXT_PROTOTYPES
 #include <iron/full.h>
+#include <iron/gl.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
 
@@ -13,20 +14,7 @@ extern char src_basic3d_vs[];
 extern u32 src_basic3d_vs_len;
 extern char src_basic3d_fs[];
 extern u32 src_basic3d_fs_len;
-u32 create_shader_from_codes(const char * vsc, const char * fsc);
 
-u32 create_shader_from_codes2(const char * vsc, int vlen, const char * fsc, int flen){
-  void * buffer1 = alloc0(vlen + 1);
-  memcpy(buffer1, vsc, vlen);
-  void * buffer2 = alloc0(flen + 1);
-  memcpy(buffer2, fsc, flen);  
-  u32 result = create_shader_from_codes(buffer1, buffer2);
-  printf("shader code: %s\n", buffer1);
-  dealloc(buffer1);
-  dealloc(buffer2);
-  return result;
-  
-}
 static float d = 2.01;
 void test_render_quadheight(){
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -35,7 +23,7 @@ void test_render_quadheight(){
   glGetIntegerv(GL_CURRENT_PROGRAM, &current_prog);
   if(!quadheight_initialized){
     quadheight_initialized = true;
-    basic3d_shader = create_shader_from_codes2(src_basic3d_vs,src_basic3d_vs_len, src_basic3d_fs,src_basic3d_fs_len);
+    basic3d_shader = gl_shader_compile2(src_basic3d_vs,src_basic3d_vs_len, src_basic3d_fs,src_basic3d_fs_len);
     glGenBuffers(1, &quadbuffer);
     glGenBuffers(1, &quadbuffer_indicies);
  
@@ -63,14 +51,13 @@ void test_render_quadheight(){
 
   float x = d;
   float r = 0;
-  if(x > 1.5 ){
-    x = 1.5;
+  if(x > 2 ){
+    x = 2;
     r = d - x;
   }
   glEnable(GL_DEPTH_TEST);  
   mat4 perspective_transform = mat4_perspective(1.0, 1, 0.1, 100);
-  mat4_print(perspective_transform);
-  logd("\n");
+
   mat4 model_transform1 = mat4_translate(-0.5,-0.5,-0.5);
   mat4 model_transform = mat4_translate(0,0,-x);
   mat4 id = mat4_identity();
@@ -99,7 +86,7 @@ void test_render_quadheight(){
   glUniformMatrix4fv(model_loc, 1, false, model.data[0]);
   glUniformMatrix4fv(inv_model_loc, 1, false, inv_model.data[0]);
   glUniform3f(camera_center_loc, 0, 0, 0);
-  logd("err? %i\n", glGetError());
+
   glCullFace( GL_BACK );
   glEnable(GL_CULL_FACE);
   glEnableVertexAttribArray(0);

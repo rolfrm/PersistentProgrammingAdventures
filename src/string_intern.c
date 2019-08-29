@@ -1,6 +1,7 @@
 #include <iron/full.h>
+#include "main.h"
 #include "u64_table.h"
-#include "u128_to_u64.h"
+#include "u64_pair_to_u64.h"
 
 
  
@@ -48,41 +49,46 @@ u64 id_new(){
 }
 
 u64 intern_string(const char * name){
+
+  printf("Interning '%s'\n", name);
   
   int len = strlen(name) / 8 + 1;
   if(len == -1)
     return 0;
-
+  printf("'%s' OK...\n", name);
   u64_table * table = string_table_get(len);
   char buffer[len * 8];
   memset(buffer, 0, len * 8);
   memmove(buffer, name, strlen(name));
   u64 id;
-  if(u64_table_try_get(table, (u64 *) buffer, &id))
+  if(u64_table_try_get(table, (u64 *) buffer, &id)){
+    printf("got old ID: %i...\n", id);
     return id;
+  }
  
   u64 newid = id_new();
+  printf("got new ID: %i...\n", newid);
   u64_table_insert(table, (u64 *) buffer, &newid, 1);
   return newid;
   
 }
 
 u64 intern_aggregate(u64 intern1, u64 intern2){
-  static u128_to_u64 * aggregate_table;
+  static u64_pair_to_u64 * aggregate_table;
   if(aggregate_table == NULL){
-    aggregate_table = u128_to_u64_create("intern_aggregate");
+    aggregate_table = u64_pair_to_u64_create("intern_aggregate");
   }
   union {
     u64 key[2];
-    u128 key2;
+    u64_pair key2;
   }x;
   x.key[0] = intern1;
   x.key[1] = intern2;
   u64 id;
-  if(u128_to_u64_try_get(aggregate_table, &x.key2, &id)){
+  if(u64_pair_to_u64_try_get(aggregate_table, &x.key2, &id)){
     return id;
   }
   id = id_new();
-  u128_to_u64_set(aggregate_table, x.key2, id);
+  u64_pair_to_u64_set(aggregate_table, x.key2, id);
   return id;
 }
