@@ -3,6 +3,8 @@ extern u64_table * control_tree;
 bool control_has_child(u64 control, u64 child);
 void control_add_child(u64 control, u64 child);
 
+void window_request_size(u64 window, int width, int height);
+
 extern alignments * alignment_table;
 extern margin_table * margins;
 extern margin_table * padding;

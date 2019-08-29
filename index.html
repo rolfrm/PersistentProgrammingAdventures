@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Cube Raycasting</title>
+    <style>
+      html, body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+      body {
+      background-color: #222222;
+      color: #FFFFFF;
+      }
+      
+      #controls2 {
+        display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+      width: 100%;
+        position: absolute;
+      }
+      .emscripten_border {
+      grid-row: 2;
+      display: flex;
+      height: 100%;
+      width: 100%;
+      position:relative;
+      }
+      #text {
+        grid-row: 1;
+      }
+      #placeholder {
+
+      height: 100%;
+      width: 100%;
+      opacity: 0.5;
+      z-index: 1;
+      }
+      #canvas {
+      z-index: 2;
+      position:absolute;
+      }
+      </style>
+  </head>
+  <body>
+    <div class="spinner" id='spinner'></div>
+    <div class="emscripten" id="status"></div>
+
+<span id='controls'>
+  <span><input type="checkbox" id="resize" checked="true" hidden=1></span>
+  <span><input type="button" value="Fullscreen" hidden=1 onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
+                                                                            document.getElementById('resize').checked)">
+  </span>
+</span>
+<div id='controls2'>
+    <p id="text">
+       Basic rendering of a distance field on the sides of a box.
+
+       <br/>Written in C, hardware accelerated using WebGL, compiled to webassembly using Emscripten.
+    </p>
+
+
+    
+    <div class="emscripten_border">
+
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+      <canvas id="placeholder" />
+    </div>
+
+    </div>
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" height="0" hidden=1></progress>
+    </div>
+    
+    <script type='text/javascript'>
+      var statusElement = document.getElementById('status');
+      var progressElement = document.getElementById('progress');
+      var spinnerElement = document.getElementById('spinner');
+      var grid = document.getElementById('controls2')
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: (function() {
+          var element = document.getElementById('output');
+          if (element) element.value = ''; // clear browser cache
+      return function(text) {
+                console.log(text);
+            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+            if (element) {
+             
+            }
+          };
+        })(),
+        printErr: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          console.error(text);
+        },
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+          return canvas;
+        })(),
+        setStatus: function(text) {
+          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+          if (text === Module.setStatus.last.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+          if (m) {
+            text = m[1];
+            progressElement.value = parseInt(m[2])*100;
+            progressElement.max = parseInt(m[4])*100;
+            progressElement.hidden = false;
+            spinnerElement.hidden = false;
+          } else {
+            progressElement.value = null;
+            progressElement.max = null;
+            progressElement.hidden = true;
+            if (!text) spinnerElement.style.display = 'none';
+          }
+          statusElement.innerHTML = text;
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('Downloading...');
+      window.onerror = function(event) {
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        Module.setStatus('Exception thrown, see JavaScript console');
+        spinnerElement.style.display = 'none';
+        Module.setStatus = function(text) {
+          if (text) Module.printErr('[post-exception status] ' + text);
+						      };
+						      };
+    </script>
+    <script async type="text/javascript" src="index.js"></script>
+  </body>
+</html>
+
+

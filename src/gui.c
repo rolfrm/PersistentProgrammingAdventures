@@ -36,6 +36,7 @@ bool control_has_child(u64 control, u64 child){
   return false;
 }
 
+
 alignments * alignment_table;
 
 margin_table * margins;
@@ -43,10 +44,28 @@ margin_table * padding;
 margin_table * color;
 margin_table * layout;
 u64_to_vec2_table * desired_size;
+u64_to_vec2_table * window_requested_size;
 u64_to_f32_table * min_width;
 u64_to_f32_table * min_height;
 u64_to_f32_table * max_width;
 u64_to_f32_table * max_height;
+
+
+void window_request_size(u64 window, int width, int height){
+  u64_to_vec2_table_set(window_requested_size, window, width, height);
+}
+
+bool window_get_requested_size(u64 window, int * width, int *  height){
+  float w,h;
+  if(u64_to_vec2_table_try_get(window_requested_size, &window, &w, &h)){
+    *width = (int)w;
+    *height = (int)h;
+    u64_to_vec2_table_unset(window_requested_size, window);
+    return true;
+  }
+  return false;
+}
+
 
 u64 arrange_method;
 u64 measure_method;
@@ -70,7 +89,7 @@ void green_button_render(u64 control){
   float x = 0,y = 0,w = 0,h = 0;
   margin_table_try_get(layout, &control, &x, &y, &w, &h);
   if(w > 0 && h > 0){
-    float r,g,b,a;
+    float r = 0,g = 0,b = 0,a = 0;
     margin_table_try_get(color, &control, &r, &g, &b, &a);
 
     blit_rectangle(x, y, w, h, r, g, b, a);
@@ -203,7 +222,7 @@ void control_measure(u64 control){
 
 
 u64_to_ptr * window_handle;
-void test_render_quadheight();
+void test_render_quadheight(float aspect);
 void render_octree_control(u64 control){
   UNUSED(control);
   float x = 0,y = 0,w = 0,h = 0;
@@ -212,11 +231,12 @@ void render_octree_control(u64 control){
   int vpdata[4];
   glGetIntegerv(GL_VIEWPORT, vpdata);
   glViewport(x,y,w,h);
-  glScissor(x,y,w,h);
+  float aspect = (float) w / h;
+  //glScissor(x,y,w,h);
   blit_push();
   blit_begin(BLIT_MODE_UNIT);
   blit_rectangle(-1,-1,2,2, 0,0,0,1);
-  test_render_quadheight();
+  test_render_quadheight(aspect);
   blit_pop();
   glViewport(vpdata[0], vpdata[1], vpdata[2], vpdata[3]);
   glScissor(vpdata[0],vpdata[1],vpdata[2],vpdata[3]);
@@ -236,6 +256,16 @@ void render_window(u64 control){
   }
   gl_window_make_current(win_handle);
 
+  int width = 512, height = 512;
+
+  {
+    int r_width, r_height;
+    if(window_get_requested_size(control, &r_width, &r_height)){
+      gl_window_get_size(win_handle, &width, &height);
+      if(r_width != width || r_height != height)
+	gl_window_set_size(win_handle, r_width, r_height);
+    }
+  }
       
   if(gl_window_get_key_state(win_handle, 0x0020)){
     printf("SPACE Pressed\n");
@@ -245,10 +275,9 @@ void render_window(u64 control){
 
   blit_begin(BLIT_MODE_PIXEL);
   blit_scale(2,2);
-  int width = 512, height = 512;
+
   gl_window_get_size(win_handle, &width, &height);
-  
-  
+    
   blit_translate(- width / 2, - height / 2);
 
   blit_rectangle(0,0,width,height, 0.2,0.2,0.2,1);
@@ -272,7 +301,7 @@ u64 class_window, class_uielement, class_button, class_green_button;
 u64 mouse_down_method;
 void gui_init(){
   layout = margin_table_create("layout");
-
+  window_requested_size = u64_to_vec2_table_create("window_requested_size");
   class_table = u64_table_create("class");
   ((bool *) (&class_table->is_multi_table))[0] = true;
   control_tree = u64_table_create("control_tree");

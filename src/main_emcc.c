@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <emscripten.h>
+#include <emscripten/html5.h>
 #include <iron/types.h>
 #include <iron/linmath.h>
 #include <iron/log.h>
@@ -36,9 +37,18 @@ void * x11_create_backend(){
 
 
 void do_mainloop(context * ctx){
-
   u64 my_window = ctx->my_window;
 
+  double w, h;
+  emscripten_get_element_css_size("placeholder", &w, &h);  
+  emscripten_set_canvas_element_size("canvas", w, h);
+  int width, height;
+  emscripten_get_canvas_element_size("canvas", &width, &height);
+
+  printf("Size: %i %i %f %f\n", width, height, (float)w, (float)h);
+
+  if(width > 0 && height > 0)
+  window_request_size(my_window, width, height);
   call_method(my_window, my_window, render_method);
 
   return;
@@ -63,9 +73,7 @@ int main(){
   context * ctx = calloc(sizeof(context), 1);
   int simulate_infinite_loop = 1;
   int fps = -1;
-
-
-  
+ 
   u64 my_window = intern_string("my window");
   logd("1?\n");
   margin_table_set(padding, my_window, 50.0, 50.0, 50.0,50.0);
@@ -83,7 +91,7 @@ int main(){
   margin_table_set(color, btn2, 1.0, 0.0, 0.0, 1.0);
 
   control_add_child(my_window, btn2);
-  
+ 
   u64 octree_view = intern_string("octree");
   set_baseclass(octree_view, class_uielement);
   control_add_child(my_window, octree_view);

@@ -15,8 +15,13 @@ extern u32 src_basic3d_vs_len;
 extern char src_basic3d_fs[];
 extern u32 src_basic3d_fs_len;
 
-static float d = 2.01;
-void test_render_quadheight(){
+static float d = 5.51;
+void test_render_quadheight(float aspect){
+  glDisable(GL_BLEND);
+  glClearDepth(2.0f);
+  glDepthMask(GL_TRUE);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);  
   glClear(GL_DEPTH_BUFFER_BIT);
   d += 0.01;
   int current_prog;
@@ -53,17 +58,18 @@ void test_render_quadheight(){
   float r = 0;
   if(x > 2 ){
     x = 2;
-    r = d - x;
+    r = d - 2;//x;
   }
-  glEnable(GL_DEPTH_TEST);  
-  mat4 perspective_transform = mat4_perspective(1.0, 1, 0.1, 100);
 
-  mat4 model_transform1 = mat4_translate(-0.5,-0.5,-0.5);
+  for(int j = 0; j < 1;j++){
+  mat4 perspective_transform = mat4_perspective(1.0, aspect, 0.1, 100);
+
+  mat4 model_transform1 = mat4_translate(-0.5,-0.5,-0.5 + j);
   mat4 model_transform = mat4_translate(0,0,-x);
   mat4 id = mat4_identity();
   var rot = mat4_rotate_Y(id, M_PI);
   rot = mat4_rotate_Y(rot, r);
-  rot = mat4_rotate_Z(rot, r);
+  rot = mat4_rotate_Z(rot, r + j);
   
   UNUSED(r);
 
@@ -95,5 +101,5 @@ void test_render_quadheight(){
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadbuffer_indicies);
   glDrawElements(GL_TRIANGLE_STRIP, 19, GL_UNSIGNED_INT, 0);
   //glDrawArrays(GL_POINTS, 0, 8);
-  glDisable(GL_DEPTH_TEST);  
+  }
 }

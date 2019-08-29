@@ -3,7 +3,7 @@ SOURCES1 = main_emcc.c string_intern.c tables.c octree.c basic3d.shader.c quadhe
 SOURCES = $(addprefix src/, $(SOURCES1))
 
 CC = emcc
-TARGET = index.html
+TARGET = index.js
 OBJECTS =$(SOURCES:.c=.bc)
 LDFLAGS= -s USE_GLFW=3 -s WASM=1 -s USE_WEBGL2=1
 LIBS= ../iron/libiron.bc ../libicydb/libicydb.bc --emrun
