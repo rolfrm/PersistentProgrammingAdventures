@@ -14,9 +14,11 @@ float LinearizeDepth(float depth)
     return (2.0 * near * far) / (far + near - z * (far - near));	
 }
 
-
 void main(){
   vec3 dir = local_ray / length(local_ray);
+
+  //  int map[16] = int[](0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0);
+
   float l = length(local_ray);
   l = LinearizeDepth(gl_FragCoord.z) * 0.3;
 
@@ -26,6 +28,7 @@ void main(){
     float d = length(ray - vec3(0.3, 0.3, 0.5)) - 0.3;
     float d2 = length(ray - vec3(0.7, 0.5, 0.7)) - 0.3;
     float d3 = length(ray - vec3(0.3, 0.7, 0.5)) - 0.3;
+
     d = min(d3, min(d, d2));
     
     vec3 color = vec3(1.0,0.6,0.6);
