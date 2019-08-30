@@ -96,7 +96,7 @@ void test_render_quadheight(float aspect){
   var rot = mat4_rotate_Y(id, M_PI);
 
   rot = mat4_rotate_X(rot, -1);
-  //rot = mat4_rotate_Y(rot, r);
+  rot = mat4_rotate_Y(rot, r);
   //rot = mat4_rotate_Z(rot, r);1
   
   UNUSED(r);
