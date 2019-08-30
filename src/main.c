@@ -17,9 +17,10 @@ typedef void * void_ptr;
 
 
 void test_octree_algorithm();
-
+void test_ray_scenarios();
 int main(int argc, char ** argv){
-
+  test_ray_scenarios();
+  //xreturn 0;
   oop_init();
   gui_init();
   test_octree_algorithm();

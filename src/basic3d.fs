@@ -17,47 +17,48 @@ float LinearizeDepth(float depth)
 void main(){
   vec3 dir = local_ray / length(local_ray);
 
-  //  int map[16] = int[](0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0);
-
-  float l = length(local_ray);
-  l = LinearizeDepth(gl_FragCoord.z) * 0.3;
-
+  int map[16] = int[](1,0,0,0, 1,0,2,0, 1,3,1,0, 1,0,0,0);
+  int map2[16] = int[](0,0,0,0, 0,1,1,0, 0,1,1,0, 1,0,0,0);
+  int colors[16] = int[](1,2,3,4, 1,1,2,0, 1,3,4,0, 1,0,0,0);
+  
   vec3 ray = local_position;
-  float distance_traveled = 0.0;
-  for(int i = 0; i < 30; i++){
-    float d = length(ray - vec3(0.3, 0.3, 0.5)) - 0.3;
-    float d2 = length(ray - vec3(0.7, 0.5, 0.7)) - 0.3;
-    float d3 = length(ray - vec3(0.3, 0.7, 0.5)) - 0.3;
+  bool hit = false;
+  int color = 0;
+  for(int i = 0; i < 100; i++){
 
-    d = min(d3, min(d, d2));
-    
-    vec3 color = vec3(1.0,0.6,0.6);
-    if(d == d2)
-      color = vec3(0.6,1.0,0.6);
-    if(d == d3)
-      color = vec3(0.6,0.6,1.0);
-
-    if(d < 0.01)
-      {
-        distance_traveled *= 2.0;
-  		    if(distance_traveled > 1.0)	
-	  distance_traveled = 1.0;
-	  
-	out_color = vec4(color * l * (1.0 - distance_traveled) + vec3(0.0) * distance_traveled, 1.0);	
-	return;
-      }
-    if(d > 2.0)
+    int x = int(ray.x * 4.0);
+    int z = int(ray.z * 4.0);
+    ray = ray + dir * 0.01;
+    if(x >= 4 || x < 0 || z >= 4 || z < 0 || ray.y < 0.0)
+      continue;
+    int low = map[x + z * 4];
+    int high = low + map2[x + z * 4];
+    int y = int(ray.y * 4.0);
+    if(y >= low && y < high ){
+      hit = true;
+      color = colors[x + z * 4];
       break;
-    ray = ray + dir * d * 1.1;
-    distance_traveled += d * 1.1;
     }
-  //discard;
-  l *= 0.1;
-  distance_traveled *= 2.0;
-  if(distance_traveled > 1.0)
-     distance_traveled = 1.0;
-	  
-  out_color = vec4(vec3(l, l, l) *(1.0 - distance_traveled) + distance_traveled * vec3(0.0),1);	
+  }
+
+  float l = length(local_position - ray);
+  if(hit == false)
+    discard;
+  if(l > 1.0)
+    l = 1.0;
+  l *= 0.2;
+
+  vec3 c = vec3(1,1,1);
+  if(color == 1)
+    c = vec3(1,0,0);
+  if(color == 2)
+    c = vec3(0,1,0);
+  if(color == 3)
+    c = vec3(0,0,1);
+  if(color == 4)    
+    c = vec3(0,1,1);  
+  //l = 0.0;
+  out_color = vec4(c *(1.0 - l) + l * vec3(0.0),1);	
 	
 
 }

@@ -15,6 +15,33 @@ extern u32 src_basic3d_vs_len;
 extern char src_basic3d_fs[];
 extern u32 src_basic3d_fs_len;
 
+vec2 advance_ray(vec2 dir, vec2 p){
+  vec2 isneg = vec2_new(dir.x < 0? -1 : 0, dir.y < 0? -1: 0);
+  vec2 p2 = vec2_add(p, vec2_scale(dir, 0.00001));
+  p2 = vec2_add(p2, isneg);
+  p2.x = ceil(p2.x);
+  p2.y = ceil(p2.y);
+  vec2 d = vec2_div(vec2_sub(p2, p), dir);
+  vec2 out = vec2_add(p, vec2_scale(dir, MIN(d.x, d.y)));
+  vec2 out3 = vec2_new(floor(out.x), floor(out.y));
+  if(d.x < d.y){
+    out3.x += isneg.x;
+  }else{
+    out3.y += isneg.y;
+  }
+  vec2_print(out3);logd("\n");
+  return out;
+}
+
+void test_ray_scenarios(){
+  vec2 p = vec2_new1(0.5);
+  for(int i = 0; i < 10; i++){
+    printf("%f %f\n", p.x, p.y);
+
+    p = advance_ray(vec2_new(0.25,-0.5), p);
+  }
+}
+
 static float d = 5.51;
 void test_render_quadheight(float aspect){
   glDisable(GL_BLEND);
@@ -53,7 +80,6 @@ void test_render_quadheight(float aspect){
     
   }
   glUseProgram(basic3d_shader);
-
   float x = d;
   float r = 0;
   if(x > 2 ){
@@ -62,14 +88,16 @@ void test_render_quadheight(float aspect){
   }
 
   for(int j = 0; j < 1;j++){
-  mat4 perspective_transform = mat4_perspective(1.0, aspect, 0.1, 100);
+  mat4 perspective_transform = mat4_perspective(1.5, aspect, 0.1, 100);
 
   mat4 model_transform1 = mat4_translate(-0.5,-0.5,-0.5 + j);
   mat4 model_transform = mat4_translate(0,0,-x);
   mat4 id = mat4_identity();
   var rot = mat4_rotate_Y(id, M_PI);
-  rot = mat4_rotate_Y(rot, r);
-  rot = mat4_rotate_Z(rot, r + j);
+
+  rot = mat4_rotate_X(rot, -1);
+  //rot = mat4_rotate_Y(rot, r);
+  //rot = mat4_rotate_Z(rot, r);1
   
   UNUSED(r);
 
