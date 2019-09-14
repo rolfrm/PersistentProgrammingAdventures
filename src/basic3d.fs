@@ -24,22 +24,6 @@ float vmin(vec3 v){
   return v.y;
 }
 
-vec3[2] advance_ray(vec3 dir, vec3 p){
-  vec3 isneg = sign(dir) * 0.5 - 0.5;
-  vec3 p2 = p + dir * 0.0001 + isneg;
-  p2 = ceil(p2);
-  vec3 d = (p2 - p) / dir;
-  vec3 out1 = p + dir * vmin(d);
-  vec3 out2 = floor(out1);
-  if(d.x < d.z)
-    out2.x += isneg.x;
-  else
-    out2.z += isneg.z;
-  vec3 outp[2];
-  outp[0] = out1;
-  outp[1] = out2;
-  return outp;
-}
 
 void main(){
   vec3 dir = local_ray / length(local_ray);
@@ -48,10 +32,29 @@ void main(){
   int map2[16] = int[](0,0,0,0, 0,1,1,0, 0,1,1,0, 1,0,0,0);
   int colors[16] = int[](1,2,3,4, 1,1,2,0, 1,3,4,0, 1,0,0,0);
   
-  vec3 ray = local_position * 4.0 - dir * 0.001;
-  bool hit = false;
+  vec3 ray = local_position * 4.0;
+  vec3 test1 = ray + dir * 0.01;
+  int x3 = int(test1.x);
+  int z3 = int(test1.z);
+  
   int color = 0;
-  for(int i = 0; i < 10; i++){
+  bool hit = false;
+
+  if(x3 >= 0 && x3 < 4 && z3 >= 0 && z3 < 4){ 
+    int low3 = map[x3 + z3 * 4];
+    int high3 = low3 + map2[x3 + z3 * 4];
+  
+    if(test1.y < float(high3) && test1.y > float(low3)){
+      color = colors[x3 + z3 * 4];
+      hit = true;
+    }
+  }
+  
+  if(!hit){
+  
+
+
+  for(int i = 0; i < 20; i++){
     vec3 p = ray;
     
     int x2 = int(p.x);
@@ -85,6 +88,7 @@ void main(){
       color = colors[x + z * 4];
       break;
     }
+  }
   }
 
   float l = length(local_position - ray);
