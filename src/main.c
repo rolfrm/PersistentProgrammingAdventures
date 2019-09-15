@@ -18,7 +18,10 @@ typedef void * void_ptr;
 
 void test_octree_algorithm();
 void test_ray_scenarios();
+void test_distfield_cubing();
 int main(int argc, char ** argv){
+  test_distfield_cubing();
+  return 0;
   test_ray_scenarios();
   //xreturn 0;
   oop_init();
@@ -56,7 +59,8 @@ int main(int argc, char ** argv){
   control_add_child(my_window, octree_view);
   define_method2(octree_view, render_method, (method)render_octree_control);
 
-  iron_gl_backend = IRON_GL_BACKEND_X11;
+  iron_gl_backend = IRON_GL_BACKEND_GLFW;
+  iron_gl_debug = true;
 
   bool running = true;
   while(running){
