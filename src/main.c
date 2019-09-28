@@ -58,7 +58,6 @@ int main(int argc, char ** argv){
 
   iron_gl_backend = IRON_GL_BACKEND_X11;
 
-  
   bool running = true;
   while(running){
     
