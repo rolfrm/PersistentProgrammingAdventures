@@ -225,7 +225,7 @@ void test_render_distfield(float aspect){
     glBufferData(GL_ARRAY_BUFFER, ctx.vert_count  * sizeof(float) * 3, ctx.verts, GL_STATIC_DRAW);
     cubes_elem_count = ctx.vert_count;
 
-    int width = 256 * 4, height = 256 * 4;
+    int width = 128, height = 128;
     //u32 totalCount = width * height;
     float * plane_data = alloc0(sizeof(float) * 3 * width * height);
     int * indicies = alloc0(sizeof(int) * width * height * 3);
@@ -331,7 +331,6 @@ void test_render_distfield(float aspect){
   orient = mat4_mul(orient, roll);
   campos.w = 0.0;
   campos = vec4_add(campos, mat4_mul_vec4(orient, vec4_new(cx,cy,cz, 1)));
-  vec4_print(campos); printf("\n");
   camera_transform = mat4_mul(camera_transform, orient);
   mat4 camera_transform_inverse = mat4_invert(camera_transform);
   //rot = mat4_rotate_Z(model_transform1, -r * 2.0);

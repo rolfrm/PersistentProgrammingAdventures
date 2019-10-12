@@ -57,11 +57,11 @@ vec3 color_func(vec3 p){
   float b = length(p - vec3(3,0,-10)) - 4.0;
   float c = length(p - vec3(0,3,-11)) - 4.0;
   if( a < b && a < c){
-    return vec3(1,0,0);
+    return vec3(0.6,0.8,0.6);
   }
   if(b < c)
-    return vec3(0,1,0);
-  return vec3(0,0,1);
+    return vec3(1,0.7,0.1);
+  return vec3(1.0,1.0,0.2);
 }
 
 void main(){

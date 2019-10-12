@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Cube Raycasting</title>
+    <title>Vertex Distance Field Casting</title>
     <style>
       html, body {
     margin: 0;
@@ -59,9 +59,10 @@
 </span>
 <div id='controls2'>
     <p id="text">
-       Basic rendering of a distance field on the sides of a box.
+      A camera-aligned grid wrapped / projected into a distance field in a vertex shader.
 
-       <br/>Written in C, hardware accelerated using WebGL, compiled to webassembly using Emscripten.
+      <br/>Written in C, hardware accelerated using WebGL, compiled to webassembly using Emscripten.
+      <br/> use arrow keys to turn(hold shift to pan), enter/ shift+enter to move. no touch support yet.
     </p>
 
 

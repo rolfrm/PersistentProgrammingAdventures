@@ -276,7 +276,7 @@ void render_window(u64 control){
   }
   current_win_handle = win_handle;
   if(gl_window_get_key_state(win_handle, KEY_ENTER)){
-    printf("SPACE Pressed\n");
+    //printf("SPACE Pressed\n");
   }
   call_method(control, control, measure_method);
   call_method(control, control, arrange_method);
