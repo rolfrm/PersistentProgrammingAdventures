@@ -1,5 +1,5 @@
 OPT = -g3 -Og
-LIB_SOURCES1 = main.c string_intern.c tables.c octree.c basic3d.shader.c quadheight.c oop.c gui.c
+LIB_SOURCES1 = main.c string_intern.c tables.c octree.c basic3d.shader.c distfield2.c oop.c gui.c
 LIB_SOURCES = $(addprefix src/, $(LIB_SOURCES1))
 
 CC = gcc

@@ -223,6 +223,7 @@ void control_measure(u64 control){
 
 u64_to_ptr * window_handle;
 void test_render_quadheight(float aspect);
+void test_render_distfield(float aspect);
 void render_octree_control(u64 control){
   UNUSED(control);
   float x = 0,y = 0,w = 0,h = 0;
@@ -236,11 +237,18 @@ void render_octree_control(u64 control){
   blit_push();
   blit_begin(BLIT_MODE_UNIT);
   blit_rectangle(-1,-1,2,2, 0,0,0,1);
-  test_render_quadheight(aspect);
+  //test_render_quadheight(aspect);
+  test_render_distfield(aspect);
   blit_pop();
   glViewport(vpdata[0], vpdata[1], vpdata[2], vpdata[3]);
   glScissor(vpdata[0],vpdata[1],vpdata[2],vpdata[3]);
   
+}
+
+void * current_win_handle;
+
+bool get_key_state(int  key){
+  return gl_window_get_key_state(current_win_handle, key);
 }
 
 void render_window(u64 control){
@@ -266,8 +274,8 @@ void render_window(u64 control){
 	gl_window_set_size(win_handle, r_width, r_height);
     }
   }
-      
-  if(gl_window_get_key_state(win_handle, 0x0020)){
+  current_win_handle = win_handle;
+  if(gl_window_get_key_state(win_handle, KEY_ENTER)){
     printf("SPACE Pressed\n");
   }
   call_method(control, control, measure_method);

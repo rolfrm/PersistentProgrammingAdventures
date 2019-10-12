@@ -39,76 +39,45 @@ vec3 get_height(vec3 ray){
   return t.xyz * size;
 }
 
+
+float distance_func(vec3 p){
+  float a = length(p - vec3(0,-70,-100)) - 80.0;
+  float b = length(p - vec3(3,0,-10)) - 4.0;
+  float c = length(p - vec3(0,3,-11)) - 4.0;
+  if( a < b && a < c){
+    return a;
+  }
+  if(b < c)
+    return b;
+  return c;
+}
+
+vec3 color_func(vec3 p){
+  float a = length(p - vec3(0,-70,-100)) - 80.0;
+  float b = length(p - vec3(3,0,-10)) - 4.0;
+  float c = length(p - vec3(0,3,-11)) - 4.0;
+  if( a < b && a < c){
+    return vec3(1,0,0);
+  }
+  if(b < c)
+    return vec3(0,1,0);
+  return vec3(0,0,1);
+}
+
 void main(){
+
   vec3 dir = local_ray / length(local_ray);
 
-  vec3 ray = local_position * size;
-  vec3 test1 = ray + dir * 0.01;
-  
-  float color = 0.0;
-  bool hit = false;
-  bool blam = false;
-  vec3 h1 = get_height(ray);
-  if(test1.y < h1.y && test1.y > h1.x){
-      color = h1.z;
-      hit = true;
-    }
-  
-  
-  if(!hit){
-    for(int i = 0; i < int(size* 1.5) ; i++){
-      vec3 p = ray;
-      vec3 h = get_height(ray);
-      
-      vec3 isneg = sign(dir) * 0.5 - 0.5;
-      isneg.y = 0.0;
-      vec3 p2 = p + dir * 0.001 + isneg;
-      if(h.y < p2.y)
-	p2.y = h.y;
-      else{
-	p2.y = -10.0;
-	blam = true;
-      }
-      p2 = ceil(p2);
-      vec3 d = (p2 - p) / dir;
-      vec3 out1 = p + dir * vmin(d) * 1.001;
-      vec3 out2 = out1;
-      
-      ray = out1;
-      float x = out2.x;
-      float z = out2.z;
-      if(x < 0.0 || x >= size || z < 0.0 || z >= size)
-	continue;
-      h = get_height(out2);
-      float y = ray.y;
-      if(y > h.x && y < h.y + 1.0 ){
-      hit = true;
-      color = h.z;
-      break;
-      }
-    }
+  vec3 ray = local_position;
+  for(int i = 0; i < 0; i++){
+    float d = distance_func(ray);
+    if(d < 0.0) break;
+    ray += dir * d;
   }
+  float col = distance_func(ray);
 
-  float l = length(local_position - ray);
-  if(hit == false/* && blam*/)
-    discard;//color = 2.0;
-  if(l > 1.0)
-    l = 1.0;
-  l *= 0.2;
-
-  vec3 c = vec3(1,1,1);
-  if(abs(color - 0.0) < 0.4)
-    c = vec3(1,0,0);
-  if(abs(color - 1.0) < 0.4)
-    c = vec3(0,1,0);
-  if(abs(color - 2.0) < 0.4)
-    c = vec3(0,0,1);
-  if(abs(color - 3.0) < 0.4)    
-    c = vec3(0,1,1);  
-  //l = 0.0;
-  //vec4 texl = texture( tex, ray.xz);
-  //c = c * texl.xyz;
-  out_color = vec4(c *(1.0 - l) + l * vec3(0.0),1);	
-	
+  float distance2 = length(ray);
+  vec3 color = color_func(ray);
+  out_color = vec4(color - vec3(distance2 * 0.01),1.0);
 
 }

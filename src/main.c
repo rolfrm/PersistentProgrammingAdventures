@@ -20,8 +20,8 @@ void test_octree_algorithm();
 void test_ray_scenarios();
 void test_distfield_cubing();
 int main(int argc, char ** argv){
-  test_distfield_cubing();
-  return 0;
+  //test_distfield_cubing();
+  //return 0;
   test_ray_scenarios();
   //xreturn 0;
   oop_init();
